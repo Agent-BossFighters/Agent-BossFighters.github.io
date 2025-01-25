@@ -25,6 +25,21 @@ const RECHARGE_COLUMNS = [
   { label: 'ACTION(S)', accessor: 'actions' }
 ];
 
+// Mise à jour des colonnes pour les SHOWRUNNER CONTRACT(S)
+const CONTRACT_COLUMNS = [
+  { label: 'RARITY', accessor: 'rarity' },
+  { label: 'NAME', accessor: 'name' },
+  { label: 'ID', accessor: 'id' },
+  { label: 'PURCHASE PRICE', accessor: 'price' }
+];
+
+// Mise à jour des données d'exemple pour les contracts
+const CONTRACT_DATA = [
+  { rarity: 'Rare', name: 'Contract Alpha', id: '#123', price: '$400' },
+  { rarity: 'Epic', name: 'Contract Beta', id: '#9999', price: '$589' },
+  { rarity: 'Rare', name: 'Contract Gamma', id: '#10242', price: '$200' }
+];
+
 export default function VestiaryPage() {
   const { rarities, isLoading: raritiesLoading } = useRarities();
   const { 
@@ -120,14 +135,11 @@ export default function VestiaryPage() {
               <EditableTable 
                 columns={[
                   { label: 'RARITY', accessor: 'rarity' },
+                  { label: 'NAME', accessor: 'name' },
                   { label: 'ID', accessor: 'id' },
                   { label: 'PURCHASE PRICE', accessor: 'price' }
                 ]}
-                data={[
-                  { rarity: 'Rare', id: '#123', price: '$400' },
-                  { rarity: 'Epic', id: '#9999', price: '$589' },
-                  { rarity: 'Rare', id: '#10242', price: '$200' }
-                ]}
+                data={CONTRACT_DATA}
                 type="showrunner_contracts"
                 onAdd={showrunnerHandlers.add}
                 onDelete={showrunnerHandlers.delete}
@@ -143,13 +155,14 @@ export default function VestiaryPage() {
               <EditableTable 
                 columns={[
                   { label: 'RARITY', accessor: 'rarity' },
+                  { label: 'NAME', accessor: 'name' },
                   { label: 'ID', accessor: 'id' },
                   { label: 'PURCHASE PRICE', accessor: 'price' }
                 ]}
                 data={[
-                  { rarity: 'Rare', id: '#123', price: '$400' },
-                  { rarity: 'Epic', id: '#9999', price: '$589' },
-                  { rarity: 'Rare', id: '#10242', price: '$200' }
+                  { rarity: 'Rare', name: 'Badge One', id: '#123', price: '$400' },
+                  { rarity: 'Epic', name: 'Badge Two', id: '#9999', price: '$589' },
+                  { rarity: 'Rare', name: 'Badge Three', id: '#10242', price: '$200' }
                 ]}
                 type="badges"
                 onAdd={badgeHandlers.add}
