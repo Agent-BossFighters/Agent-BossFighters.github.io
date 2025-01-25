@@ -1,5 +1,6 @@
 import { useRarities } from '../../hook/useRarities';
 import { ReusableTable } from '@/shared/ui/ReusableTable';
+import { EditableTable } from '@/shared/ui/EditableTable';
 
 // Données statiques extraites pour plus de clarté
 const SHOWRUNNER_COLUMNS = [
@@ -24,6 +25,33 @@ const RECHARGE_COLUMNS = [
 
 export default function VestiaryPage() {
   const { rarities, isLoading } = useRarities();
+
+  // Handlers simplifiés avec une structure commune
+  const createHandler = (type) => ({
+    add: async (newItem) => {
+      try {
+        console.log(`Adding ${type}:`, newItem);
+        return true;
+      } catch (error) {
+        console.error(`Error adding ${type}:`, error);
+        return false;
+      }
+    },
+    delete: async (item) => {
+      try {
+        console.log(`Deleting ${type}:`, item);
+        return true;
+      } catch (error) {
+        console.error(`Error deleting ${type}:`, error);
+        return false;
+      }
+    }
+  });
+
+  // Création des handlers pour chaque type
+  const badgeHandlers = createHandler('badge');
+  const buildHandlers = createHandler('build');
+  const showrunnerHandlers = createHandler('contract');
 
   return (
     <div className="p-4 sm:p-6 md:p-8">
@@ -79,55 +107,71 @@ export default function VestiaryPage() {
                 <span className="w-5 h-5 bg-blue-500/20 rounded flex items-center justify-center">📄</span>
                 SHOWRUNNER CONTRACT(S)
               </h2>
-              <ReusableTable 
-                columns={SHOWRUNNER_COLUMNS}
-                data={[
-                  { rarity: 'Rare', id: '#123', price: '$400', actions: '' },
-                  { rarity: 'Epic', id: '#9999', price: '$589', actions: '' },
-                  { rarity: 'Rare', id: '#10242', price: '$200', actions: '' }
+              <EditableTable 
+                columns={[
+                  { label: 'RARITY', accessor: 'rarity' },
+                  { label: 'ID', accessor: 'id' },
+                  { label: 'PURCHASE PRICE', accessor: 'price' }
                 ]}
+                data={[
+                  { rarity: 'Rare', id: '#123', price: '$400' },
+                  { rarity: 'Epic', id: '#9999', price: '$589' },
+                  { rarity: 'Rare', id: '#10242', price: '$200' }
+                ]}
+                type="showrunner_contracts"
+                onAdd={showrunnerHandlers.add}
+                onDelete={showrunnerHandlers.delete}
               />
             </div>
 
-            {/* BADGE(S) Section */}
+            {/* BADGE(S) Section avec EditableTable */}
             <div>
               <h2 className="text-[#FFD32A] text-xl mb-4 flex items-center gap-2">
                 <span className="w-5 h-5 bg-blue-500/20 rounded flex items-center justify-center">🏅</span>
                 BADGE(S)
               </h2>
-              <ReusableTable 
+              <EditableTable 
                 columns={[
                   { label: 'RARITY', accessor: 'rarity' },
                   { label: 'ID', accessor: 'id' },
-                  { label: 'PURCHASE PRICE', accessor: 'price' },
-                  { label: 'ACTION(S)', accessor: 'actions' }
+                  { label: 'PURCHASE PRICE', accessor: 'price' }
                 ]}
                 data={[
-                  { rarity: 'Rare', id: '#123', price: '$400', actions: '' },
-                  { rarity: 'Epic', id: '#9999', price: '$589', actions: '' },
-                  { rarity: 'Rare', id: '#10242', price: '$200', actions: '' }
+                  { rarity: 'Rare', id: '#123', price: '$400' },
+                  { rarity: 'Epic', id: '#9999', price: '$589' },
+                  { rarity: 'Rare', id: '#10242', price: '$200' }
                 ]}
+                type="badges"
+                onAdd={badgeHandlers.add}
+                onDelete={badgeHandlers.delete}
               />
             </div>
           </div>
 
           {/* Colonne de droite */}
           <div className="space-y-8">
-            {/* BUILD(S) Section */}
+            {/* BUILD(S) Section avec EditableTable */}
             <div>
               <h2 className="text-[#FFD32A] text-xl mb-4 flex items-center gap-2">
                 <span className="w-5 h-5 bg-blue-500/20 rounded flex items-center justify-center">🛠️</span>
                 BUILD(S)
               </h2>
-              <ReusableTable 
-                columns={BUILDS_COLUMNS}
-                data={[
-                  { name: 'Fighter Badge', bonus: '2.22', perks: '3.75', actions: '' },
-                  { name: 'Fighter Striker', bonus: '2.01', perks: '3.75', actions: '' },
-                  { name: 'Fighter Lobber', bonus: '2.01', perks: '3.75', actions: '' },
-                  { name: 'Boss Speed Maul/Laser', bonus: '1.35', perks: '2.21', actions: '' },
-                  { name: 'Boss Hammer/Toxic Gun', bonus: '1.35', perks: '2.21', actions: '' }
+              <EditableTable 
+                columns={[
+                  { label: 'BUILD NAME', accessor: 'name' },
+                  { label: 'BONUS MULTIPLIER', accessor: 'bonus', className: 'text-white' },
+                  { label: 'PERKS MULTIPLIER', accessor: 'perks', className: 'text-white' }
                 ]}
+                data={[
+                  { name: 'Fighter Badge', bonus: '2.22', perks: '3.75' },
+                  { name: 'Fighter Striker', bonus: '2.01', perks: '3.75' },
+                  { name: 'Fighter Lobber', bonus: '2.01', perks: '3.75' },
+                  { name: 'Boss Speed Maul/Laser', bonus: '1.35', perks: '2.21' },
+                  { name: 'Boss Hammer/Toxic Gun', bonus: '1.35', perks: '2.21' }
+                ]}
+                type="builds"
+                onAdd={buildHandlers.add}
+                onDelete={buildHandlers.delete}
               />
             </div>
 
@@ -139,7 +183,11 @@ export default function VestiaryPage() {
               </h2>
               <div className="flex items-start gap-4">
                 <ReusableTable 
-                  columns={RECHARGE_COLUMNS}
+                  columns={[
+                    { label: 'DISCOUNT TIME', accessor: 'time' },
+                    { label: 'NUMBER', accessor: 'number', className: 'text-white' },
+                    { label: 'ACTION(S)', accessor: 'actions' }
+                  ]}
                   data={[
                     { time: '5%', number: '1', actions: '' },
                     { time: '10%', number: '3', actions: '' },
