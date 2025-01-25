@@ -11,10 +11,17 @@ export default function Login() {
 
   const handleLogin = async (data) => {
     try {
-      const userData = await authSignInUp("login", data);
-      console.log(userData);
+      console.log('Tentative de connexion avec:', data);
+      const userData = await authSignInUp("/api/v1/login", data);
+      console.log('Réponse du serveur:', userData);
+      
+      // Si la connexion réussit
+      if (userData.token) {
+        console.log('Connexion réussie!');
+        // Rediriger vers le dashboard ou la page souhaitée
+      }
     } catch (error) {
-      console.log(error);
+      console.error('Erreur de connexion:', error);
     }
   };
 

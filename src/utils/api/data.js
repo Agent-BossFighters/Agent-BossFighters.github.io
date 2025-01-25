@@ -1,4 +1,4 @@
-import { BASE_URL, kyInstance } from "./config-fetch";
+import { BASE_URL, kyInstance } from "./ky-config";
 
 // Fonction pour récupérer les données
 export async function getData(object) {

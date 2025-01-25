@@ -1,41 +1,49 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getData } from '@api/data';
 
-const STATIC_RARITIES = [
-  { id: 1, name: 'Common' },
-  { id: 2, name: 'Uncommon' },
-  { id: 3, name: 'Rare' },
-  { id: 4, name: 'Epic' },
-  { id: 5, name: 'Legendary' },
-  { id: 6, name: 'Mythic' },
-  { id: 7, name: 'Exalted' },
-  { id: 8, name: 'Exotic' },
-  { id: 9, name: 'Transcendent' },
-  { id: 10, name: 'Unique' }
-];
+const RARITY_COLORS = {
+  common: 'gray-400',
+  uncommon: 'green-400',
+  rare: 'blue-400',
+  epic: 'purple-400',
+  legendary: 'orange-400',
+  mythic: 'yellow-400',
+  exalted: 'pink-400',
+  exotic: '[#e879f9]',
+  transcendent: 'red-400',
+  unique: 'rose-400'
+};
 
 export function useRarities() {
-  const [rarities] = useState(STATIC_RARITIES);
+  const [rarities, setRarities] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchRarities = async () => {
+      try {
+        const data = await getData('/api/v1/rarities');
+        setRarities(data);
+      } catch (err) {
+        console.error('Error fetching rarities:', err);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRarities();
+  }, []);
 
   const getRarityColor = (rarity) => {
-    switch (rarity?.toLowerCase()) {
-      case 'common': return 'border-2 border-gray-400 text-slate-100';
-      case 'uncommon': return 'border-2 border-green-400 text-slate-100';
-      case 'rare': return 'border-2 border-blue-400 text-slate-100';
-      case 'epic': return 'border-2 border-purple-400 text-slate-100';
-      case 'legendary': return 'border-2 border-orange-400 text-slate-100';
-      case 'mythic': return 'border-2 border-yellow-400 text-slate-100';
-      case 'exalted': return 'border-2 border-pink-400 text-slate-100';
-      case 'exotic': return 'border-2 border-[#e879f9] text-slate-100';
-      case 'transcendent': return 'border-2 border-red-400 text-slate-100';
-      case 'unique': return 'border-2 border-rose-400 text-slate-100';
-      default: return 'border-2 border-zinc-400 text-slate-100';
-    }
+    const color = RARITY_COLORS[rarity?.toLowerCase()];
+    return `border-2 border-${color || 'zinc-400'} text-slate-100`;
   };
 
   return { 
     rarities, 
-    isLoading: false, 
-    error: null, 
+    isLoading, 
+    error, 
     getRarityColor 
   };
 } 

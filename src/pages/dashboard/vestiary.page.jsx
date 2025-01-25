@@ -1,6 +1,8 @@
-import { useRarities } from '../../hook/useRarities';
+import { useRarities } from '@/hook/useRarities';
+import { useBuilds } from '@/hook/useBuilds';
 import { ReusableTable } from '@/shared/ui/ReusableTable';
 import { EditableTable } from '@/shared/ui/EditableTable';
+import { ApiTest } from '@/components/ApiTest';
 
 // Données statiques extraites pour plus de clarté
 const SHOWRUNNER_COLUMNS = [
@@ -24,7 +26,13 @@ const RECHARGE_COLUMNS = [
 ];
 
 export default function VestiaryPage() {
-  const { rarities, isLoading } = useRarities();
+  const { rarities, isLoading: raritiesLoading } = useRarities();
+  const { 
+    builds, 
+    isLoading: buildsLoading,
+    addBuild,
+    deleteBuild 
+  } = useBuilds();
 
   // Handlers simplifiés avec une structure commune
   const createHandler = (type) => ({
@@ -55,6 +63,8 @@ export default function VestiaryPage() {
 
   return (
     <div className="p-4 sm:p-6 md:p-8">
+      <ApiTest />
+
       <div className="max-w-7xl mx-auto">
         <h1 className="text-[#FFD32A] font-extrabold text-3xl tracking-wide mb-8">
           LOCKER
@@ -73,7 +83,7 @@ export default function VestiaryPage() {
                 <div className="w-full md:w-auto">
                   <label className="block text-xs text-gray-400 mb-1">MAX ITEM RARITY TO SHOW</label>
                   <select className="w-full md:w-48 bg-black border border-gray-800 rounded p-2 text-white">
-                    {isLoading ? (
+                    {raritiesLoading ? (
                       <option>Loading...</option>
                     ) : (
                       rarities.map((rarity) => (
@@ -162,16 +172,10 @@ export default function VestiaryPage() {
                   { label: 'BONUS MULTIPLIER', accessor: 'bonus', className: 'text-white' },
                   { label: 'PERKS MULTIPLIER', accessor: 'perks', className: 'text-white' }
                 ]}
-                data={[
-                  { name: 'Fighter Badge', bonus: '2.22', perks: '3.75' },
-                  { name: 'Fighter Striker', bonus: '2.01', perks: '3.75' },
-                  { name: 'Fighter Lobber', bonus: '2.01', perks: '3.75' },
-                  { name: 'Boss Speed Maul/Laser', bonus: '1.35', perks: '2.21' },
-                  { name: 'Boss Hammer/Toxic Gun', bonus: '1.35', perks: '2.21' }
-                ]}
+                data={builds}
                 type="builds"
-                onAdd={buildHandlers.add}
-                onDelete={buildHandlers.delete}
+                onAdd={addBuild}
+                onDelete={deleteBuild}
               />
             </div>
 

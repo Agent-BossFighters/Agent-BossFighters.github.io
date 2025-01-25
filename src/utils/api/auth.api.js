@@ -1,25 +1,28 @@
 import Cookies from "js-cookie";
 import { BASE_URL, kyInstance } from "@api/ky-config";
 
-export async function authSignInUp(object, data) {
+export async function authSignInUp(endpoint, data) {
   try {
-    let response = await kyInstance.post(BASE_URL + object, {
+    console.log('Envoi de la requête à:', endpoint);
+    console.log('Données:', data);
+    
+    const response = await kyInstance.post(endpoint, {
       json: data,
+      throwHttpErrors: false // Pour gérer nous-mêmes les erreurs
     });
-    // Cookies.set("agent-auth", response.headers.get("Authorization"), {
-    //   secure: true,
-    //   sameSite: "strict",
-    // });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Erreur d\'authentification');
+    }
+
     const userData = await response.json();
-    // const refreshToken = userData.refreshToken;
-    // Cookies.set("agent-refresh", refreshToken, {
-    //   secure: true,
-    //   sameSite: "strict",
-    // });
-    return await userData;
+    console.log('Réponse:', userData);
+    
+    return userData;
   } catch (error) {
-    let errorData = await error.responseData;
-    throw new Error(JSON.stringify(errorData));
+    console.error('Erreur complète:', error);
+    throw error;
   }
 }
 
