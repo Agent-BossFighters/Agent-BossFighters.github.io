@@ -20,10 +20,14 @@ export { default as TimeToken } from "./time-token.png";
 export { default as Token2 } from "./token2.png";
 export { default as Token3 } from "./token3.png";
 export { default as Token4 } from "./token4.png";
+export { default as Badge } from "./badge.png";
+export { default as Soldier } from "./soldier.png";
+export { default as RechargeDiscount } from "./recharge-discount.png";
+export { default as Tactic } from "./tactic.png";
 // Nouvelles images
 export { default as Monthly } from "./Monthly.png";
 export { default as Playermap } from "./Playermap.png";
 export { default as Locker } from "./locker.png";
 export { default as Schedule } from "./schedule.png";
 export { default as Fighting } from "./fighting.png";
-export { default as TvTools } from "./tv_tools.png"; 
+export { default as TvTools } from "./tv_tools.png";
