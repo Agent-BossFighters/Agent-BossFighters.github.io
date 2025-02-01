@@ -1,5 +1,5 @@
-import Button from "@ui/buttons/button";
-import Input from "@ui/input/input";
+import { Button } from "@ui/button";
+import { Input } from "@ui/input";
 import { authSignInUp } from "@api/auth.api";
 import useForm from "@features/users/hook/useForm";
 import { useState } from "react"; // Ajout pour gérer les messages d'erreur
@@ -110,13 +110,12 @@ export default function Register() {
         <p className="text-red-500 text-sm">{errors.confirmPassword}</p>
       )}
 
-      <Button 
-        type="submit" 
-        variant="" 
+      <Button
+        type="submit"
+        className="w-full text-background"
         disabled={loading}
-        className="w-full"
       >
-        {loading ? "Inscription en cours..." : "S'inscrire"}
+        {loading ? "Chargement..." : "Sign up"}
       </Button>
     </form>
   );
