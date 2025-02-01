@@ -1,4 +1,4 @@
-import { LockerGrid } from '@features/dashboard/locker/locker-grid';
+import LockerGrid from '@features/dashboard/locker/locker-grid';
 
 export default function LockerPage() {
   return (

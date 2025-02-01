@@ -1,33 +1,34 @@
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@ui/table";
-import { Button } from "@ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@ui/table";
+
+const HEADERS = ["RARITY", "ITEM", "ID", "PURCHASE PRICE", "ACTION(S)"];
+
+const CONTRACTS_DATA = [
+  { rarity: "Epic", item: "Contender Showrunner Contract", id: "#123", price: "$400" },
+  { rarity: "Epic", item: "Contender Showrunner Contract", id: "#9999", price: "$389" },
+  { rarity: "Rare", item: "Encore Showrunner Contract", id: "#14042", price: "$200" },
+];
+
+const RARITY_STYLES = {
+  Epic: "bg-purple-500/20 text-purple-400 border border-purple-500",
+  Rare: "bg-blue-500/20 text-blue-400 border border-blue-500",
+};
 
 export function ContractsTable() {
-  const contracts = [
-    { rarity: "Epic", item: "Contender Showrunner Contract", id: "#123", price: "$400" },
-    { rarity: "Epic", item: "Contender Showrunner Contract", id: "#9999", price: "$389" },
-    { rarity: "Rare", item: "Encore Showrunner Contract", id: "#14042", price: "$200" },
-  ];
-
   return (
     <div className="bg-black rounded-lg overflow-hidden border border-gray-800">
       <Table>
         <TableHeader>
           <TableRow className="bg-[#1E2124] border-b border-gray-800">
-            <TableHead className="text-white font-medium">RARITY</TableHead>
-            <TableHead className="text-white font-medium">ITEM</TableHead>
-            <TableHead className="text-white font-medium">ID</TableHead>
-            <TableHead className="text-white font-medium">PURCHASE PRICE</TableHead>
-            <TableHead className="text-white font-medium">ACTION(S)</TableHead>
+            {HEADERS.map(header => (
+              <TableHead key={header} className="text-white font-medium">{header}</TableHead>
+            ))}
           </TableRow>
         </TableHeader>
         <TableBody>
-          {contracts.map((contract) => (
+          {CONTRACTS_DATA.map((contract) => (
             <TableRow key={contract.id} className="h-[52px] border-b border-gray-800">
               <TableCell>
-                <span className={`px-3 py-1 rounded ${
-                  contract.rarity === "Epic" ? "bg-purple-500/20 text-purple-400 border border-purple-500" :
-                  contract.rarity === "Rare" ? "bg-blue-500/20 text-blue-400 border border-blue-500" : ""
-                }`}>
+                <span className={`px-3 py-1 rounded ${RARITY_STYLES[contract.rarity]}`}>
                   {contract.rarity}
                 </span>
               </TableCell>

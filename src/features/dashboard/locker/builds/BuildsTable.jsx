@@ -1,28 +1,28 @@
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@ui/table";
-import { Button } from "@ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@ui/table";
+
+const HEADERS = ["BUILD NAME", "BONUS MULTIPLIER", "PERKS MULTIPLIER", "ACTION(S)"];
+
+const BUILDS_DATA = [
+  { name: "Fighter Railgun", bonus: "2.22", perks: "3.75" },
+  { name: "Fighter Striker", bonus: "2.01", perks: "3.75" },
+  { name: "Fighter Lobber", bonus: "2.01", perks: "3.75" },
+  { name: "Boss Spiked Maul / Laser", bonus: "1.35", perks: "2.21" },
+  { name: "Boss Hammer / Toxic Gun", bonus: "1.35", perks: "2.21" },
+];
 
 export function BuildsTable() {
-  const builds = [
-    { name: "Fighter Railgun", bonus: "2.22", perks: "3.75" },
-    { name: "Fighter Striker", bonus: "2.01", perks: "3.75" },
-    { name: "Fighter Lobber", bonus: "2.01", perks: "3.75" },
-    { name: "Boss Spiked Maul / Laser", bonus: "1.35", perks: "2.21" },
-    { name: "Boss Hammer / Toxic Gun", bonus: "1.35", perks: "2.21" },
-  ];
-
   return (
     <div className="bg-black rounded-lg overflow-hidden border border-gray-800">
       <Table>
         <TableHeader>
           <TableRow className="bg-[#1E2124] border-b border-gray-800">
-            <TableHead className="text-white font-medium">BUILD NAME</TableHead>
-            <TableHead className="text-white font-medium">BONUS MULTIPLIER</TableHead>
-            <TableHead className="text-white font-medium">PERKS MULTIPLIER</TableHead>
-            <TableHead className="text-white font-medium">ACTION(S)</TableHead>
+            {HEADERS.map(header => (
+              <TableHead key={header} className="text-white font-medium">{header}</TableHead>
+            ))}
           </TableRow>
         </TableHeader>
         <TableBody>
-          {builds.map((build, index) => (
+          {BUILDS_DATA.map((build, index) => (
             <TableRow key={index} className="h-[52px] border-b border-gray-800">
               <TableCell className="text-white">{build.name}</TableCell>
               <TableCell className="text-white">{build.bonus}</TableCell>
