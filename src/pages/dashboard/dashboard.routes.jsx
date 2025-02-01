@@ -1,20 +1,31 @@
-import { Routes, Route } from "react-router-dom";
-import DashboardPage from "./dashboard.page";
-import LockerPage from "./locker.page";
-import DatalabPage from "./datalab.page";
-import ScheduleRoutes from "./schedule/schedule.routes";
-import PlayingRoutes from "./playing/playing.routes";
+import { lazy } from "react";
+import { Route, Routes } from "react-router-dom";
+
+const DashboardPage = lazy(() => import("./dashboard.page"));
+const LockerPage = lazy(() => import("./locker.page"));
+const DatalabPage = lazy(() => import("./datalab.page"));
+
+export const dashboardRoutes = [
+  {
+    path: "",
+    element: <DashboardPage />,
+  },
+  {
+    path: "locker",
+    element: <LockerPage />,
+  },
+  {
+    path: "datalab",
+    element: <DatalabPage />,
+  }
+];
 
 export default function DashboardRoutes() {
   return (
-    <>
-      <Routes>
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/locker" element={<LockerPage />} />
-        <Route path="/datalab" element={<DatalabPage />} />
-        <Route path="/schedule/*" element={<ScheduleRoutes />} />
-        <Route path="/playing/*" element={<PlayingRoutes />} />
-      </Routes>
-    </>
+    <Routes>
+      {dashboardRoutes.map((route) => (
+        <Route key={route.path} path={route.path} element={route.element} />
+      ))}
+    </Routes>
   );
-}
+} 
