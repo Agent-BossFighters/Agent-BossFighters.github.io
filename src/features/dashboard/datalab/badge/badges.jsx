@@ -9,13 +9,17 @@ import {
 } from "@ui/table";
 import data from "@shared/data/rarities.json";
 import { getValue } from "../hook/value";
+import { BadgeCommon } from "@img/index";
 
 export default function Badges({ badges, loading }) {
   const rarities = data.rarities;
   if (loading) return <div>Loading...</div>;
   return (
     <div>
-      <h2 className="text-3xl font-extrabold py-2">{/* Icon */}BADGES</h2>
+      <h2 className="text-3xl font-extrabold py-2 flex items-center gap-2">
+        <img src={BadgeCommon} alt="Badge" className="w-10 h-10" />
+        BADGES
+      </h2>
       <Table className="">
         <TableCaption>Desc ?</TableCaption>
         <TableHeader>

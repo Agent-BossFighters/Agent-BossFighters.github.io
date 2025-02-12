@@ -11,6 +11,7 @@ import {
 import data from "@shared/data/rarities.json";
 import { useContracts } from "./hook/useContracts";
 import { getValue } from "../hook/value";
+import { Contract } from "@img/index";
 
 export default function Showrunner() {
   const { contracts, loading, fetchMyContracts } = useContracts();
@@ -25,8 +26,9 @@ export default function Showrunner() {
   }
   return (
     <>
-      <h2 className="text-3xl font-extrabold py-2">
-        {/* Icon */}SHOWRUNNER CONTRACTS
+      <h2 className="text-3xl font-extrabold py-2 flex items-center gap-2">
+        <img src={Contract} alt="Contract" className="w-10 h-10" />
+        SHOWRUNNER CONTRACTS
       </h2>
       <Table className="">
         <TableCaption>Desc ?</TableCaption>

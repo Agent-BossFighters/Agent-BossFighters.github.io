@@ -7,14 +7,16 @@ import {
   TableHeader,
   TableRow,
 } from "@ui/table";
+import { Contract } from "@img/index";
 
 const levels = Array.from({ length: 30 }, (_, i) => i + 1);
 
 export default function Showrunner() {
   return (
     <>
-      <h2 className="text-3xl font-extrabold py-2">
-        {/* Icon */}SHOWRUNNER CONTRACTS
+      <h2 className="text-3xl font-extrabold py-2 flex items-center gap-2">
+        <img src={Contract} alt="Contract" className="w-10 h-10" />
+        SHOWRUNNER CONTRACTS
       </h2>
       <Table className="overflow-y-scroll">
         <TableCaption>Desc ?</TableCaption>

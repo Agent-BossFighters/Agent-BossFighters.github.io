@@ -26,9 +26,7 @@ export default function Badges() {
 
   return (
     <>
-      <h2 className="text-3xl font-extrabold py-2">
-        {/* Icon */}CRAFT DIGITAL ASSETS
-      </h2>
+      <h2 className="text-3xl font-extrabold py-2">CRAFT DIGITAL ASSETS</h2>
       <Table className="w-1/2">
         <TableCaption>Desc ?</TableCaption>
         <TableHeader>

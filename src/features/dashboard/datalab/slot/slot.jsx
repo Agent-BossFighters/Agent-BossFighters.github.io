@@ -9,13 +9,17 @@ import {
   TableRow,
 } from "@ui/table";
 import { getValue } from "../hook/value";
+import { BadgeCommon } from "@img/index";
 
 export default function Slot({ slots, loading }) {
   if (loading) return <div>Loading...</div>;
 
   return (
     <div className="pt-5">
-      <h2 className="text-3xl font-extrabold py-2">{/* Icon */}SLOTS COST</h2>
+      <h2 className="text-3xl font-extrabold py-2 flex items-center gap-2">
+        <img src={BadgeCommon} alt="Badge" className="w-10 h-10" />
+        SLOTS COST
+      </h2>
       <Table className="w-1/2">
         <TableCaption>Desc ?</TableCaption>
         <TableHeader>
