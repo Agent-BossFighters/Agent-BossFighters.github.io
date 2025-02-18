@@ -1,6 +1,7 @@
 import Cookies from "js-cookie";
 import { BASE_URL, kyInstance } from "@api/ky-config";
 import { cleanUserData } from "@utils/api/auth.utils";
+import { toast } from "react-hot-toast";
 
 export async function authSignInUp(object, data) {
   try {
@@ -9,10 +10,12 @@ export async function authSignInUp(object, data) {
     });
     const userData = await response.json();
     if (userData.token) {
+      toast.success(userData.message);
       return { user: cleanUserData(userData.user), token: userData.token };
     }
   } catch (error) {
     let errorData = await error.responseData;
+    toast.error(errorData.error);
     throw new Error(JSON.stringify(errorData));
   }
 }

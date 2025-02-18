@@ -1,9 +1,11 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@ui/button";
 import { Input } from "@ui/input";
 import { authSignInUp } from "@api/auth.api";
 import useForm from "@features/users/hook/useForm";
 import { useAuth } from "@context/auth.context";
+import toast from "react-hot-toast";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -16,6 +18,12 @@ export default function Login() {
     "login",
   );
 
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      Object.values(errors).forEach((error) => toast.error(error));
+    }
+  }, [errors]);
+
   const handleLogin = async (data) => {
     try {
       const payload = {
@@ -25,15 +33,17 @@ export default function Login() {
         },
       };
       const response = await authSignInUp("/v1/login", payload);
-      console.log("message", response.message);
       if (response.token && response.user) {
         login(response.user, response.token);
         navigate("/dashboard");
+        return response;
       }
     } catch (error) {
       console.log(error);
+      throw error;
     }
   };
+
   return (
     <form
       onSubmit={(e) => {
@@ -49,7 +59,6 @@ export default function Login() {
         value={values.email}
         onChange={handleChange}
       />
-      {errors.email && <p className="text-red-500">{errors.email}</p>}
 
       <Input
         type="password"
@@ -58,7 +67,6 @@ export default function Login() {
         value={values.password}
         onChange={handleChange}
       />
-      {errors.password && <p className="text-red-500">{errors.password}</p>}
 
       <Button
         type="submit"

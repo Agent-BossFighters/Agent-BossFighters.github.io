@@ -1,7 +1,9 @@
+import { useEffect } from "react";
 import { Button } from "@ui/button";
 import { Input } from "@ui/input";
 import { authSignInUp } from "@api/auth.api";
 import useForm from "@features/users/hook/useForm";
+import toast from "react-hot-toast";
 
 export default function Register() {
   const { values, errors, loading, handleChange, handleSubmit } = useForm(
@@ -14,11 +16,18 @@ export default function Register() {
     "register",
   );
 
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      Object.values(errors).forEach((error) => toast.error(error));
+    }
+  }, [errors]);
+
   const handleRegister = async (data) => {
     if (data.password !== data.confirmPassword) {
-      console.error("Les mots de passe ne correspondent pas");
+      toast.error("Password and confirm password do not match");
       return;
     }
+
     const payload = {
       user: {
         email: data.email,
@@ -31,7 +40,7 @@ export default function Register() {
       const userData = await authSignInUp("/v1/signup", payload);
       console.log("Utilisateur enregistré:", userData);
     } catch (err) {
-      console.error("Erreur d'enregistrement:", err);
+      toast.error("Error while registering user", err);
     }
   };
 
@@ -50,7 +59,7 @@ export default function Register() {
         value={values.username}
         onChange={handleChange}
       />
-      {errors.username && <p className="text-red-500">{errors.username}</p>}
+
       <Input
         type="email"
         name="email"
@@ -58,7 +67,6 @@ export default function Register() {
         value={values.email}
         onChange={handleChange}
       />
-      {errors.email && <p className="text-red-500">{errors.email}</p>}
 
       <Input
         type="password"
@@ -67,7 +75,6 @@ export default function Register() {
         value={values.password}
         onChange={handleChange}
       />
-      {errors.password && <p className="text-red-500">{errors.password}</p>}
 
       <Input
         type="password"
@@ -76,16 +83,13 @@ export default function Register() {
         value={values.confirmPassword}
         onChange={handleChange}
       />
-      {errors.confirmPassword && (
-        <p className="text-red-500">{errors.confirmPassword}</p>
-      )}
 
       <Button
         type="submit"
         className="w-full h-12 text-background"
         disabled={loading}
       >
-        {loading ? "Chargement..." : "Sign up"}
+        {loading ? "Loading..." : "Register"}
       </Button>
     </form>
   );

@@ -1,4 +1,5 @@
 import { BASE_URL, kyInstance } from "./ky-config";
+import { toast } from "react-hot-toast";
 
 // Fonction pour récupérer les données
 export async function getData(object) {
@@ -25,6 +26,7 @@ export async function postData(object, data) {
     return response.json();
   } catch (error) {
     let errorData = await error.responseData;
+    toast.error(errorData.error);
     throw new Error(JSON.stringify(errorData));
   }
 }
@@ -44,6 +46,7 @@ export async function putData(object, data) {
     return response.json();
   } catch (error) {
     let errorData = await error.responseData;
+    toast.error(errorData.error);
     throw new Error(JSON.stringify(errorData));
   }
 }
@@ -52,11 +55,10 @@ export async function putData(object, data) {
 export async function deleteData(object) {
   try {
     const response = await kyInstance.delete(BASE_URL + object);
-    // const responseData = await response.json();
-    // console.log(responseData);
     return response;
   } catch (error) {
     let errorData = await error.responseData;
+    toast.error(errorData.error);
     throw new Error(JSON.stringify(errorData));
   }
 }
