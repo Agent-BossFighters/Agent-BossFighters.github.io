@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@ui/button";
 import { Input } from "@ui/input";
 import { authSignInUp } from "@api/auth.api";
@@ -6,6 +7,7 @@ import useForm from "@features/users/hook/useForm";
 import toast from "react-hot-toast";
 
 export default function Register() {
+  const navigate = useNavigate();
   const { values, errors, loading, handleChange, handleSubmit } = useForm(
     {
       username: "",
@@ -37,8 +39,9 @@ export default function Register() {
     };
 
     try {
-      const userData = await authSignInUp("/v1/signup", payload);
-      console.log("Utilisateur enregistré:", userData);
+      await authSignInUp("/v1/signup", payload);
+      navigate("/users/login");
+      toast.success("User registered successfully!");
     } catch (err) {
       toast.error("Error while registering user", err);
     }

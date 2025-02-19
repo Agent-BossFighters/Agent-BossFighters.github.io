@@ -23,6 +23,9 @@ export async function postData(object, data) {
       options.body = JSON.stringify(data);
     }
     const response = await kyInstance.post(BASE_URL + object, options);
+    if (response.message) {
+      toast.success(response.message);
+    }
     return response.json();
   } catch (error) {
     let errorData = await error.responseData;

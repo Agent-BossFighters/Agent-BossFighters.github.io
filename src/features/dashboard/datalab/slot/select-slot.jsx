@@ -38,7 +38,7 @@ export default function SelectSlot({
   return (
     <Select onValueChange={handleValueChange} defaultValue={selectedRarity}>
       <SelectTrigger
-        className={`inline-flex items-center gap-1 w-auto min-w-max px-4 py-2 ${rounded ? "rounded-full" : ""}`}
+        className={`inline-flex items-center gap-1 w-full ${rounded ? "rounded-full" : ""}`}
         style={{ color: selectedColor }}
       >
         <SelectValue placeholder="Select" />
