@@ -45,31 +45,34 @@ export default function Lockerbuilds() {
   const handleSubmit = async () => {
     const missingFields = [];
     if (!buildName) missingFields.push("Build Name");
-    if (!bonus) missingFields.push("Bonus Multiplier");
-    if (!perks) missingFields.push("Perks Multiplier");
+    if (!bonus) missingFields.push("$BFT Bonus");
     if (missingFields.length > 0) {
       toast.error(
         `Missing fields: ${missingFields.join(", ")}. Please fill all fields.`
       );
+      return;
     }
+
     const payload = {
       user_build: {
         buildName: buildName,
-        bonusMultiplier: bonus,
-        perksMultiplier: perks,
+        bftBonus: bonus,
       },
     };
-    setLoading(true);
+
     toast.promise(postData("v1/user_builds/create", payload), {
-      loading: "Creating Build...",
-      success: (res) => {
-        setBuilds((prevBuilds) => [...prevBuilds, res.build]);
-        setBuildName("");
-        setBonus("");
-        setPerks("");
-        return "Build created successfully";
+      loading: "Creating build...",
+      success: (response) => {
+        if (response?.build) {
+          setBuilds((prevBuilds) => [...prevBuilds, response.build]);
+          setBuildName("");
+          setBonus("");
+          return "Build created successfully";
+        }
+        throw new Error("Invalid response format");
       },
       error: (err) => {
+        console.error("Error creating build:", err);
         return `Error: ${err.message}`;
       },
     });
@@ -77,18 +80,20 @@ export default function Lockerbuilds() {
 
   const handleDelete = async (buildId) => {
     const confirm = window.confirm(
-      "Are you sure you want to delete this badge?"
+      "Are you sure you want to delete this build?"
     );
     if (!confirm) return;
+
     toast.promise(deleteData(`v1/user_builds/${buildId}`), {
-      loading: "Deleting NFT...",
+      loading: "Deleting build...",
       success: () => {
         setBuilds((prevBuilds) =>
-          prevBuilds.filter((buildData) => buildData.id !== buildId)
+          prevBuilds.filter((build) => build.id !== buildId)
         );
-        return "Showrunner contract deleted successfully";
+        return "Build deleted successfully";
       },
       error: (err) => {
+        console.error("Error deleting build:", err);
         return `Error: ${err.message}`;
       },
     });
@@ -114,8 +119,7 @@ export default function Lockerbuilds() {
           <TableHeader>
             <TableRow>
               <TableHead>BUILD NAME</TableHead>
-              <TableHead>BONUS MULTIPLIER</TableHead>
-              <TableHead>PERKS MULTIPLIER</TableHead>
+              <TableHead>$BFT BONUS</TableHead>
               <TableHead>ACTION(S)</TableHead>
             </TableRow>
           </TableHeader>
@@ -140,25 +144,18 @@ export default function Lockerbuilds() {
                     <TableCell>
                       {isEditing ? (
                         <NumericInput
-                          placeholder="Bonus Multiplier"
+                          placeholder="$BFT Bonus"
                           value={editedBonus}
                           onChange={setEditedBonus}
                           className="w-1/2"
+                          min={0}
+                          max={600}
+                          step={0.1}
                         />
                       ) : (
-                        build.bonusMultiplier
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {isEditing ? (
-                        <NumericInput
-                          placeholder="Perks Multiplier"
-                          value={editedPerks}
-                          onChange={setEditedPerks}
-                          className="w-1/2"
-                        />
-                      ) : (
-                        build.perksMultiplier
+                        <div className="flex flex-col">
+                          <span>{`${build.bftBonus}%`}</span>
+                        </div>
                       )}
                     </TableCell>
                     <TableCell className="flex gap-2 items-center">
@@ -176,7 +173,7 @@ export default function Lockerbuilds() {
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center">
+                <TableCell colSpan={3} className="text-center">
                   No Builds found
                 </TableCell>
               </TableRow>
@@ -188,25 +185,19 @@ export default function Lockerbuilds() {
                 <Input
                   type="text"
                   placeholder="Build Name"
-                  inputMode="numeric"
                   value={buildName}
                   onChange={(e) => setBuildName(e.target.value)}
                 />
               </TableCell>
               <TableCell>
                 <NumericInput
-                  placeholder="Bonus Multiplier"
+                  placeholder="$BFT Bonus"
                   value={bonus}
                   onChange={setBonus}
                   className="w-1/2"
-                />
-              </TableCell>
-              <TableCell>
-                <NumericInput
-                  placeholder="Perks Multiplier"
-                  value={perks}
-                  onChange={setPerks}
-                  className="w-1/2"
+                  min={0}
+                  max={600}
+                  step={0.1}
                 />
               </TableCell>
               <TableCell className="flex items-center">

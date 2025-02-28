@@ -1,18 +1,8 @@
 import { useState } from "react";
-import { Check, X, Plus, Pencil, Trash2 } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@ui/select";
-import { Input } from "@ui/input";
-import RaritySelect from "./rarity-select";
-import { useGameConstants } from "@context/gameConstants.context";
-import { useDaily } from "../hooks/useDaily";
+import MatchDisplayRow from "./MatchDisplayRow";
+import MatchFormRow from "./MatchFormRow";
 
-const MAX_SLOTS = 5; // Nombre maximum de slots possible
+const MAX_SLOTS = 5;
 const INITIAL_FORM_STATE = {
   buildId: "",
   map: "",
@@ -37,16 +27,6 @@ export default function MatchEntry({
   onCancel,
   unlockedSlots,
 }) {
-  const { GAME_MAPS, GAME_RESULTS } = useGameConstants();
-  const {
-    calculateEnergyUsed,
-    calculateEnergyCost,
-    calculateTokenValue,
-    calculatePremiumValue,
-    calculateLuckrate,
-    calculateProfit,
-  } = useDaily();
-
   const [formData, setFormData] = useState(() => ({
     ...INITIAL_FORM_STATE,
     rarities: Array(MAX_SLOTS).fill("none"),
@@ -71,9 +51,16 @@ export default function MatchEntry({
   };
 
   const validateForm = (data) => {
-    if (!data.buildId || !data.map || !data.result || !data.time || !data.bft) {
+    const missingFields = [];
+    if (!data.buildId) missingFields.push("Build Name");
+    if (!data.map) missingFields.push("Map");
+    if (!data.result) missingFields.push("Result");
+    if (!data.time) missingFields.push("Time");
+    if (!data.bft) missingFields.push("BFT");
+
+    if (missingFields.length > 0) {
       alert(
-        "Please fill in all required fields (Build, Map, Result, Time, BFT)"
+        `Missing fields: ${missingFields.join(", ")}. Please fill all fields.`
       );
       return false;
     }
@@ -87,7 +74,6 @@ export default function MatchEntry({
     return true;
   };
 
-  // Ajout d'une fonction utilitaire pour formater les noms de maps
   const formatMapName = (mapName) => {
     return mapName.toLowerCase().replace(/\s+/g, "_");
   };
@@ -96,12 +82,10 @@ export default function MatchEntry({
     const selectedBuild = builds.find((b) => b.id === data.buildId);
     if (!selectedBuild) return null;
 
-    // Validation des valeurs requises
     if (!data.map || !data.result || !data.time || !data.bft) {
       throw new Error("Tous les champs obligatoires doivent être remplis");
     }
 
-    // Validation des valeurs numériques
     const time = parseInt(data.time);
     const totalToken = parseInt(data.bft);
     const totalPremiumCurrency = parseInt(data.flex || 0);
@@ -120,11 +104,8 @@ export default function MatchEntry({
       );
     }
 
-    // Validation des valeurs énumérées
     const validMaps = ["toxic_river", "award", "radiation_rift"];
     const validResults = ["win", "loss", "draw"];
-
-    // Sécurisation des valeurs avant transformation
     const map = formatMapName(String(data.map || ""));
     const result = String(data.result || "").toLowerCase();
 
@@ -136,7 +117,9 @@ export default function MatchEntry({
 
     if (!validResults.includes(result)) {
       throw new Error(
-        `Résultat invalide '${data.result}'. Valeurs acceptées : ${validResults.join(", ")}`
+        `Résultat invalide '${data.result}'. Valeurs acceptées : ${validResults.join(
+          ", "
+        )}`
       );
     }
 
@@ -146,10 +129,11 @@ export default function MatchEntry({
         build: selectedBuild.buildName,
         map: map,
         time: time,
-        energyUsed: parseFloat(calculateEnergyUsed(time)),
         result: result,
         totalToken: totalToken,
         totalPremiumCurrency: totalPremiumCurrency,
+        bonusMultiplier: parseFloat(selectedBuild.bonusMultiplier),
+        perksMultiplier: parseFloat(selectedBuild.perksMultiplier),
         badge_used_attributes: data.rarities
           .map((rarity, index) => {
             const slot = index + 1;
@@ -208,7 +192,7 @@ export default function MatchEntry({
     } else {
       onUpdate(matchData)
         .then(() => {
-          onCancel(); // Sortir du mode édition après une mise à jour réussie
+          onCancel();
         })
         .catch((error) => {
           console.error("Erreur détaillée:", error);
@@ -221,232 +205,32 @@ export default function MatchEntry({
     }
   };
 
-  // Mode affichage
   if (!isEditing && !isCreating) {
-    const currentBuild = builds.find((b) => b.buildName === match.build);
-    const energyUsed = calculateEnergyUsed(match.time);
-    const matchRarities = Array(MAX_SLOTS)
-      .fill("none")
-      .map((_, index) => {
-        const badge = match.badge_used?.find((b) => b.slot === index + 1);
-        return badge ? badge.rarity : "none";
-      });
-
     return (
-      <tr>
-        <td className="min-w-[120px]">
-          <span className="font-medium">{match.build}</span>
-        </td>
-        {matchRarities.map((rarity, index) => (
-          <td key={index} className="text-center min-w-[60px]">
-            <RaritySelect value={rarity} onChange={() => {}} disabled={true} />
-          </td>
-        ))}
-        <td className="text-center min-w-[80px]">
-          {calculateLuckrate(matchRarities)}
-        </td>
-        <td className="text-center min-w-[80px]">{match.time}</td>
-        <td className="text-center min-w-[80px]">{energyUsed}</td>
-        <td className="text-center min-w-[80px] text-destructive">
-          ${calculateEnergyCost(energyUsed)}
-        </td>
-        <td className="text-center min-w-[100px] capitalize">{match.map}</td>
-        <td className="text-center min-w-[80px] capitalize">{match.result}</td>
-        <td className="text-center min-w-[80px]">{match.totalToken}</td>
-        <td className="text-center min-w-[80px] text-accent">
-          ${calculateTokenValue(match.totalToken)}
-        </td>
-        <td className="text-center min-w-[80px]">
-          {match.totalPremiumCurrency}
-        </td>
-        <td className="text-center min-w-[80px] text-accent">
-          ${calculatePremiumValue(match.totalPremiumCurrency)}
-        </td>
-        <td className="text-center min-w-[80px] text-green-500">
-          ${calculateProfit(match)}
-        </td>
-        <td className="text-center min-w-[80px]">
-          {currentBuild?.bonusMultiplier || "1.0"}
-        </td>
-        <td className="text-center min-w-[80px]">
-          {currentBuild?.perksMultiplier || "1.0"}
-        </td>
-        <td className="flex gap-2 items-center justify-center min-w-[100px]">
-          <button
-            onClick={() => onEdit(match)}
-            className="p-2 hover:bg-yellow-400 rounded-lg"
-          >
-            <Pencil className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => onDelete(match.id)}
-            className="p-2 hover:bg-red-400 rounded-lg"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
-        </td>
-      </tr>
+      <MatchDisplayRow
+        match={match}
+        builds={builds}
+        isEditing={isEditing}
+        isCreating={isCreating}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        onSubmit={handleSubmit}
+        onCancel={onCancel}
+      />
     );
   }
 
-  // Mode édition ou création
-  const data = isCreating ? formData : editedData;
-  const energyUsed = calculateEnergyUsed(data.time);
-
   return (
-    <tr>
-      <td className="min-w-[120px]">
-        <Select
-          value={data.buildId}
-          onValueChange={(value) => handleChange("buildId", value)}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select" />
-          </SelectTrigger>
-          <SelectContent>
-            {builds.map((build) => (
-              <SelectItem key={build.id} value={build.id}>
-                {build.buildName}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </td>
-      {Array(MAX_SLOTS)
-        .fill(null)
-        .map((_, index) => (
-          <td key={index} className="min-w-[60px]">
-            {index >= unlockedSlots ? (
-              <span className="text-center text-gray-400">-</span>
-            ) : (
-              <RaritySelect
-                value={data.rarities[index]}
-                onChange={(value) => handleRarityChange(index, value)}
-                disabled={index >= unlockedSlots}
-              />
-            )}
-          </td>
-        ))}
-      <td className="text-center min-w-[80px]">
-        {calculateLuckrate(data.rarities)}
-      </td>
-      <td className="min-w-[80px]">
-        <Input
-          type="number"
-          className="w-20"
-          placeholder="0"
-          value={data.time}
-          onChange={(e) => handleChange("time", e.target.value)}
-        />
-      </td>
-      <td className="text-center min-w-[80px]">{energyUsed}</td>
-      <td className="text-center min-w-[80px] text-destructive">
-        ${calculateEnergyCost(energyUsed)}
-      </td>
-      <td className="min-w-[100px]">
-        <Select
-          value={data.map}
-          onValueChange={(value) => handleChange("map", formatMapName(value))}
-        >
-          <SelectTrigger className="w-32">
-            <SelectValue placeholder="Select">
-              {data.map
-                ? data.map
-                    .replace(/_/g, " ")
-                    .replace(/\b\w/g, (c) => c.toUpperCase())
-                : "Select"}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent className="z-[100]">
-            {GAME_MAPS.map((m) => (
-              <SelectItem key={m} value={m}>
-                {m.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </td>
-      <td className="min-w-[80px]">
-        <Select
-          value={data.result}
-          onValueChange={(value) => handleChange("result", value)}
-        >
-          <SelectTrigger className="w-20">
-            <SelectValue placeholder="Select" />
-          </SelectTrigger>
-          <SelectContent>
-            {GAME_RESULTS.map((r) => (
-              <SelectItem key={r} value={r}>
-                {r.charAt(0).toUpperCase() + r.slice(1)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </td>
-      <td className="min-w-[80px]">
-        <Input
-          type="number"
-          className="w-20"
-          placeholder="0"
-          value={data.bft}
-          onChange={(e) => handleChange("bft", e.target.value)}
-        />
-      </td>
-      <td className="text-center min-w-[80px] text-accent">
-        ${calculateTokenValue(data.bft)}
-      </td>
-      <td className="min-w-[80px]">
-        <Input
-          type="number"
-          className="w-20"
-          placeholder="0"
-          value={data.flex}
-          onChange={(e) => handleChange("flex", e.target.value)}
-        />
-      </td>
-      <td className="text-center min-w-[80px] text-accent">
-        ${calculatePremiumValue(data.flex)}
-      </td>
-      <td className="text-center min-w-[80px] text-green-500">
-        $
-        {calculateProfit({
-          time: data.time,
-          totalToken: data.bft,
-          totalPremiumCurrency: data.flex,
-          build: builds.find((b) => b.id === data.buildId),
-        })}
-      </td>
-      <td className="text-center min-w-[80px]">
-        {builds.find((b) => b.id === data.buildId)?.bonusMultiplier || "1.0"}
-      </td>
-      <td className="text-center min-w-[80px]">
-        {builds.find((b) => b.id === data.buildId)?.perksMultiplier || "1.0"}
-      </td>
-      <td className="flex gap-2 items-center justify-center min-w-[100px]">
-        {isCreating ? (
-          <button
-            onClick={handleSubmit}
-            className="p-2 hover:bg-yellow-400 rounded-lg"
-          >
-            <Plus className="h-4 w-4" />
-          </button>
-        ) : (
-          <>
-            <button
-              onClick={handleSubmit}
-              className="p-2 hover:bg-green-400 rounded-lg"
-            >
-              <Check className="h-4 w-4" />
-            </button>
-            <button
-              onClick={onCancel}
-              className="p-2 hover:bg-red-400 rounded-lg"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </>
-        )}
-      </td>
-    </tr>
+    <MatchFormRow
+      data={isCreating ? formData : editedData}
+      builds={builds}
+      isEditing={isEditing}
+      isCreating={isCreating}
+      unlockedSlots={unlockedSlots}
+      onSubmit={handleSubmit}
+      onCancel={onCancel}
+      onChange={handleChange}
+      onRarityChange={handleRarityChange}
+    />
   );
 }
